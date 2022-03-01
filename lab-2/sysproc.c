@@ -51,7 +51,7 @@ int sys_waitpid(void){
 
   // pid is 0, status 1, options 2. cuz waitpid(pid, status, options)
   if ((argint(0, &pid) < 0) || (argptr(1, (void *) &status, sizeof(*status)) < 0) || (argint(2, &options) < 0)){
-    return -1
+    return -1;
   }
 
   return waitpid(pid, status, options);
