@@ -3,12 +3,13 @@
 #include "user.h"
 
 int main(int argc, char *argv[1]){
-    //printf("hello world\n");
+    printf("hello world\n");
     
     // list of childs, so i can reference their pids
     int pids[3] = {0, 0, 0};
     int exitStatuses[3] = {5, 22, 13};
-    
+    int pid;
+
     for(int i = 0; i < 3; i++){
         pid = fork();
         pids[i] = pid;
