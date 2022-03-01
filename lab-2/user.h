@@ -24,6 +24,11 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 
+// lab 2
+void exitStatus(int status);
+int waitStatus(int *status);
+int waitpid(int pid, int *status, int options);
+
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);

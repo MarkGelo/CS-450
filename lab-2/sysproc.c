@@ -20,6 +20,43 @@ sys_exit(void)
   return 0;  // not reached
 }
 
+// lab 2
+int sys_exitStatus(void)
+{
+  int status;
+
+  if (argint(0, &status) < 0){ // pass in an integer, passing arguments into a kernel function - https://stackoverflow.com/questions/27068394/how-to-pass-a-value-into-a-system-call-function-in-xv6
+    return -1;
+  }
+
+  exitStatus(status);
+
+  return 0; // not reached
+}
+
+int sys_waitStatus(void){
+  int *status;
+  
+  if (argptr(0, (void *) &status, sizeof(*status)) < 0){
+    return -1;
+  }
+
+  return waitStatus(status);
+}
+
+int sys_waitpid(void){
+  int pid;
+  int options;
+  int *status;
+
+  // pid is 0, status 1, options 2. cuz waitpid(pid, status, options)
+  if ((argint(0, &pid) < 0) || (argptr(1, (void *) &status, sizeof(*status)) < 0) || (argint(2, &options) < 0)){
+    return -1
+  }
+
+  return waitpid(pid, status, options);
+}
+
 int
 sys_wait(void)
 {
