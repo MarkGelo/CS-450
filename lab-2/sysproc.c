@@ -34,6 +34,8 @@ int sys_exitStatus(void)
   return 0; // not reached
 }
 
+//sysfile.c has code that uses argptr
+
 int sys_waitStatus(void){
   int *status;
   
@@ -50,7 +52,13 @@ int sys_waitpid(void){
   int *status;
 
   // pid is 0, status 1, options 2. cuz waitpid(pid, status, options)
-  if ((argint(0, &pid) < 0) || (argptr(1, (void *) &status, sizeof(*status)) < 0) || (argint(2, &options) < 0)){
+  if (argint(0, &pid) < 0){
+    return -1;
+  }
+  if (argptr(1, (void *) &status, sizeof(*status)) < 0){
+    return -1;
+  }
+  if (argint(2, &options) < 0){
     return -1;
   }
 
