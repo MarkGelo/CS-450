@@ -3,7 +3,7 @@
 #include "user.h"
 
 int main(int argc, char *argv[1]){
-    printf("hello world\n");
+    printf(1, "hello world\n");
     
     // list of childs, so i can reference their pids
     int pids[3] = {0, 0, 0};
@@ -14,7 +14,7 @@ int main(int argc, char *argv[1]){
         pid = fork();
         pids[i] = pid;
         if (pid == 0){
-            printf("(Child, PID = %d) exiting with status %d", pid, exitStatuses[i])
+            printf(1, "(Child, PID = %d) exiting with status %d", pid, exitStatuses[i])
             exitStatus(exitStatuses[i]);
         }
     }
