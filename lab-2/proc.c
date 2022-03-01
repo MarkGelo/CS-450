@@ -412,7 +412,7 @@ int waitStatus(int *status){
 // execution until a  process with the given pid terminates ????
 int waitpid(int pid, int *status, int options){
   struct proc *p;
-  int havekids, pid;
+  int havekids;
   struct proc *curproc = myproc();
   
   acquire(&ptable.lock);
