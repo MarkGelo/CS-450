@@ -14,7 +14,7 @@ int main(int argc, char *argv[1]){
         pid = fork();
         pids[i] = pid;
         if (pid == 0){
-            printf(1, "(Child, PID = %d) exiting with status %d", pid, exitStatuses[i])
+            printf(1, "(Child, PID = %d) exiting with status %d", pid, exitStatuses[i]);
             exitStatus(exitStatuses[i]);
         }
     }
