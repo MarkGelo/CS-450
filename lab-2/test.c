@@ -31,7 +31,6 @@ int main(int argc, char *argv[1]){
         }
     }
 
-    sleep(2); // give time so most childs finish
     for(int i = 0; i < 3; i++){
         pid = waitStatus(&exitStatus_);
         printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus_);
@@ -56,7 +55,6 @@ int main(int argc, char *argv[1]){
         pids[i] = pid;
     }
 
-    sleep(2); // give time so most childs finish
     for(int i = 0; i < 3; i++){
         printf(1, "(Parent) Waiting for child with PID = %d to exit \n", pids[2 - i]);
         pid = waitpid(pids[2 - i], &exitStatus_, options[i]);
