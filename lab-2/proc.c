@@ -299,9 +299,6 @@ exitStatus(int status)
 
   acquire(&ptable.lock);
 
-  // store the exit status - Lab 2
-  curproc -> status = status;
-
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);
 
@@ -313,6 +310,9 @@ exitStatus(int status)
         wakeup1(initproc);
     }
   }
+
+  // store the exit status - Lab 2
+  curproc -> status = status;
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
