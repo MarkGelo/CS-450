@@ -11,7 +11,7 @@
 int main(int argc, char *argv[1]){
     //printf(1, "hello world\n");
     
-    printf(1, "Testing exitStatus(int status) and waitStatus(int *status)");
+    printf(1, "Testing exitStatus(int status) and waitStatus(int *status)\n");
     // list of childs, so i can reference their pids
     //int pids[3] = {0, 0, 0};
     int exitStatuses[3] = {5, 22, 13};
@@ -26,11 +26,12 @@ int main(int argc, char *argv[1]){
         }
         //pids[i] = pid;
         if (pid == 0){ // child has their pid = 0
-            printf(1, "(Child, PID = %d) exiting with status %d \n", pid, exitStatuses[i]);
+            printf(1, "(Child) exiting with status %d \n", pid, exitStatuses[i]);
             exitStatus(exitStatuses[i]);
         }
     }
 
+    sleep(2); // give time so most childs finish
     for(int i = 0; i < 3; i++){
         pid = waitStatus(&exitStatus_);
         printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus_);
