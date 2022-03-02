@@ -58,7 +58,7 @@ int main(int argc, char *argv[1]){
 
     sleep(2); // give time so most childs finish
     for(int i = 0; i < 3; i++){
-        pid = waitpid(pids[i], &exitStatus_, options[i]);
+        pid = waitpid(pids[2 - i], &exitStatus_, options[i]);
         printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus_);
     }
 
