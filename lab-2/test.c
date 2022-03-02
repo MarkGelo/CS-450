@@ -37,7 +37,7 @@ int main(int argc, char *argv[1]){
         printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus_);
     }
 
-    printf(1, "\n")
+    printf(1, "\n");
     printf(1, "Testing waitpid\n");
     // list of childs, so i can reference their pids
     int pids[3] = {0, 0, 0};
