@@ -11,7 +11,7 @@
 int main(int argc, char *argv[1]){
     //printf(1, "hello world\n");
     
-    printf(1, "Testing exitStatus(int status) and waitStatus(int *status)")
+    printf(1, "Testing exitStatus(int status) and waitStatus(int *status)");
     // list of childs, so i can reference their pids
     //int pids[3] = {0, 0, 0};
     int exitStatuses[3] = {5, 22, 13};
