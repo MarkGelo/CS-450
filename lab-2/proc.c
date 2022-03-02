@@ -279,7 +279,7 @@ exitStatus(int status)
   int fd;
 
   // store the exit status - Lab 2
-  curproc -> status = status;
+  //curproc -> status = status;
 
   if(curproc == initproc)
     panic("init exiting");
@@ -298,6 +298,9 @@ exitStatus(int status)
   curproc->cwd = 0;
 
   acquire(&ptable.lock);
+
+  // store the exit status - Lab 2
+  curproc -> status = status;
 
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);
