@@ -41,7 +41,7 @@ int main(int argc, char *argv[1]){
     printf(1, "Testing waitpid\n");
     // list of childs, so i can reference their pids
     int pids[3] = {0, 0, 0};
-    int options[3] = {7, 6, 5}
+    int options[3] = {7, 6, 5};
 
     for(int i = 0; i < 3; i++){
         pid = fork();
