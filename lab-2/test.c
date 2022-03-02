@@ -16,7 +16,7 @@ int main(int argc, char *argv[1]){
     //int pids[3] = {0, 0, 0};
     int exitStatuses[3] = {5, 22, 13};
     int pid;
-    int exitStatus;
+    int exitStatus_;
 
     for(int i = 0; i < 3; i++){
         pid = fork();
@@ -32,8 +32,8 @@ int main(int argc, char *argv[1]){
     }
 
     for(int i = 0; i < 3; i++){
-        pid = waitStatus(&exitStatus);
-        printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus);
+        pid = waitStatus(&exitStatus_);
+        printf(1, "(Parent) Child with PID = %d exited with status %d \n", pid, exitStatus_);
     }
     
     exit();
