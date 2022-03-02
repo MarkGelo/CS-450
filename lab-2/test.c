@@ -26,7 +26,7 @@ int main(int argc, char *argv[1]){
         }
         //pids[i] = pid;
         if (pid == 0){ // child has their pid = 0
-            printf(1, "(Child) exiting with status %d \n", pid, exitStatuses[i]);
+            printf(1, "(Child) exiting with status %d \n", exitStatuses[i]);
             exitStatus(exitStatuses[i]);
         }
     }
