@@ -90,6 +90,8 @@ found:
   p->pid = nextpid++;
   p -> prio = 0; // lab 3
   p -> runs = 0; // lab 3
+  p -> timestart = ticks; // lab 3
+  p -> burst = 0; // lab 3
 
   release(&ptable.lock);
 
@@ -203,6 +205,8 @@ fork(void)
   *np->tf = *curproc->tf;
   np -> prio = curproc -> prio; // lab 3
   np -> runs = 0; // lab 3
+  np -> burst = 0; // lab 3
+  np -> timestart = ticks; // lab 3
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -250,6 +254,11 @@ exit(void)
   iput(curproc->cwd);
   end_op();
   curproc->cwd = 0;
+
+  timeend = ticks;
+  turnaroundtime = timeend - curproc -> timestart;
+  waitingtime = turnaroundtime - curproc -> burst;
+  cprintf("\n Turnaround time: %d | Waiting time: %d\n, ", turnaroundtime, waitingtime);
 
   acquire(&ptable.lock);
 
@@ -539,12 +548,15 @@ scheduler(void)
       if(p -> prio < 31){
         p -> prio++; // decrease the prio by adding 1, making sure not over 31
       }
+      uint tmpstart = ticks; // time start
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
+      uint tmpend = ticks; // time end
+      p -> burst = p -> burst + (tmpend - tmpstart); // calc burst time and increment each time
       c->proc = 0;
     }
     release(&ptable.lock);

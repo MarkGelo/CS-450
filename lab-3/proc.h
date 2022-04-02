@@ -52,6 +52,8 @@ struct proc {
   int status;                   // so can save exit status - Lab 2
   int prio;                     // add priority value to a proc, [0, 31], lab 3
   int runs;                     // lab 3, aging? how man runs it has done. so when prio has ties, it goes by runs
+  int timestart;               // lab 3, keep track of start time
+  int burst;                  // lab 3 keep track of burst, time its runnning
 };
 
 // Process memory is laid out contiguously, low addresses first:
