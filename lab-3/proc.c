@@ -258,7 +258,7 @@ exit(void)
   int timeend = ticks;
   int turnaroundtime = timeend - curproc -> timestart;
   int waitingtime = turnaroundtime - curproc -> burst;
-  cprintf("\nTurnaround time: %d | Waiting time: %d\n", turnaroundtime, waitingtime);
+  cprintf("\nPID: %d, Turnaround time: %d | Waiting time: %d\n", curproc -> pid, turnaroundtime, waitingtime);
 
   acquire(&ptable.lock);
 
@@ -484,6 +484,7 @@ void setprio(int priority){
     acquire(&ptable.lock);
     p -> prio = priority;
     p -> state = RUNNABLE;
+    cprintf("PID: %d, Prio: %d\n", p -> pid, priority);
     sched();
     release(&ptable.lock);
   }
