@@ -1,0 +1,532 @@
+Only in lab-3: bio.d
+Only in lab-3: bio.o
+Only in lab-3: bootasm.d
+Only in lab-3: bootasm.o
+Only in lab-3: bootblock
+Only in lab-3: bootblock.asm
+Only in lab-3: bootblock.o
+Only in lab-3: bootblockother.o
+Only in lab-3: bootmain.d
+Only in lab-3: bootmain.o
+Only in lab-3: _cat
+Only in lab-3: cat.asm
+Only in lab-3: cat.d
+Only in lab-3: cat.o
+Only in lab-3: cat.sym
+Only in lab-3: console.d
+Only in lab-3: console.o
+diff -r xv6-original/defs.h lab-3/defs.h
+107a108
+> void            exitStatus(int); // lab 2
+120a122,123
+> int             waitStatus(int*); // lab 2
+> int             waitpid(int, int*, int); // lab 2
+122a126
+> void            setprio(int); // lab 3
+Only in lab-3: _echo
+Only in lab-3: echo.asm
+Only in lab-3: echo.d
+Only in lab-3: echo.o
+Only in lab-3: echo.sym
+Only in lab-3: entry.o
+Only in lab-3: entryother
+Only in lab-3: entryother.asm
+Only in lab-3: entryother.d
+Only in lab-3: entryother.o
+Only in lab-3: exec.d
+Only in lab-3: exec.o
+Only in lab-3: file.d
+Only in lab-3: file.o
+Only in lab-3: _forktest
+Only in lab-3: forktest.asm
+Only in lab-3: forktest.d
+Only in lab-3: forktest.o
+Only in lab-3: fs.d
+Only in lab-3: fs.img
+Only in lab-3: fs.o
+Only in lab-3: _grep
+Only in lab-3: grep.asm
+Only in lab-3: grep.d
+Only in lab-3: grep.o
+Only in lab-3: grep.sym
+Only in lab-3: ide.d
+Only in lab-3: ide.o
+Only in lab-3: _init
+Only in lab-3: init.asm
+Only in lab-3: initcode
+Only in lab-3: initcode.asm
+Only in lab-3: initcode.d
+Only in lab-3: initcode.o
+Only in lab-3: initcode.out
+Only in lab-3: init.d
+Only in lab-3: init.o
+Only in lab-3: init.sym
+Only in lab-3: ioapic.d
+Only in lab-3: ioapic.o
+Only in lab-3: kalloc.d
+Only in lab-3: kalloc.o
+Only in lab-3: kbd.d
+Only in lab-3: kbd.o
+Only in lab-3: kernel
+Only in lab-3: kernel.asm
+Only in lab-3: kernel.sym
+Only in lab-3: _kill
+Only in lab-3: kill.asm
+Only in lab-3: kill.d
+Only in lab-3: kill.o
+Only in lab-3: kill.sym
+Only in lab-3: lapic.d
+Only in lab-3: lapic.o
+Only in lab-3: _ln
+Only in lab-3: ln.asm
+Only in lab-3: ln.d
+Only in lab-3: ln.o
+Only in lab-3: ln.sym
+Only in lab-3: log.d
+Only in lab-3: log.o
+Only in lab-3: _ls
+Only in lab-3: ls.asm
+Only in lab-3: ls.d
+Only in lab-3: ls.o
+Only in lab-3: ls.sym
+Only in lab-3: main.d
+Only in lab-3: main.o
+diff -r xv6-original/Makefile lab-3/Makefile
+183a184
+> 	_test\
+Only in lab-3: _mkdir
+Only in lab-3: mkdir.asm
+Only in lab-3: mkdir.d
+Only in lab-3: mkdir.o
+Only in lab-3: mkdir.sym
+Only in lab-3: mkfs
+Only in lab-3: mp.d
+Only in lab-3: mp.o
+Only in lab-3: picirq.d
+Only in lab-3: picirq.o
+Only in lab-3: pipe.d
+Only in lab-3: pipe.o
+Only in lab-3: printf.d
+Only in lab-3: printf.o
+diff -r xv6-original/proc.c lab-3/proc.c
+90a91,94
+>   p -> prio = 0; // lab 3
+>   p -> runs = 0; // lab 3
+>   p -> timestart = ticks; // lab 3
+>   p -> burst = 0; // lab 3
+201a206,209
+>   np -> prio = curproc -> prio; // lab 3
+>   np -> runs = 0; // lab 3
+>   np -> burst = 0; // lab 3
+>   np -> timestart = ticks; // lab 3
+249a258,262
+>   int timeend = ticks;
+>   int turnaroundtime = timeend - curproc -> timestart;
+>   int waitingtime = turnaroundtime - curproc -> burst;
+>   cprintf("\nPID: %d, Turnaround time: %d | Waiting time: %d\n", curproc -> pid, turnaroundtime, waitingtime);
+> 
+269a283,335
+> // Lab 2 Update
+> // Exit the current process.  Does not return.
+> // An exited process remains in the zombie state
+> // until its parent calls wait() to find out it exited.
+> void
+> exitStatus(int status)
+> {
+>   struct proc *curproc = myproc();
+>   struct proc *p;
+>   int fd;
+> 
+>   // store the exit status - Lab 2
+>   //curproc -> status = status;
+> 
+>   if(curproc == initproc)
+>     panic("init exiting");
+> 
+>   // Close all open files.
+>   for(fd = 0; fd < NOFILE; fd++){
+>     if(curproc->ofile[fd]){
+>       fileclose(curproc->ofile[fd]);
+>       curproc->ofile[fd] = 0;
+>     }
+>   }
+> 
+>   begin_op();
+>   iput(curproc->cwd);
+>   end_op();
+>   curproc->cwd = 0;
+> 
+>   acquire(&ptable.lock);
+> 
+>   // Parent might be sleeping in wait().
+>   wakeup1(curproc->parent);
+> 
+>   // Pass abandoned children to init.
+>   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+>     if(p->parent == curproc){
+>       p->parent = initproc;
+>       if(p->state == ZOMBIE)
+>         wakeup1(initproc);
+>     }
+>   }
+> 
+>   // store the exit status - Lab 2
+>   curproc -> status = status;
+> 
+>   // Jump into the scheduler, never to return.
+>   curproc->state = ZOMBIE;
+>   sched();
+>   panic("zombie exit");
+> }
+> 
+313a380,492
+> // lab 2
+> int waitStatus(int *status){
+>   struct proc *p;
+>   int havekids, pid;
+>   struct proc *curproc = myproc();
+>   
+>   acquire(&ptable.lock);
+>   for(;;){
+>     // Scan through table looking for exited children.
+>     havekids = 0;
+>     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+>       if(p->parent != curproc)
+>         continue;
+>       havekids = 1;
+>       if(p->state == ZOMBIE){
+>         // Found one.
+>         pid = p->pid;
+>         kfree(p->kstack);
+>         p->kstack = 0;
+>         freevm(p->pgdir);
+>         p->pid = 0;
+>         p->parent = 0;
+>         p->name[0] = 0;
+>         p->killed = 0;
+>         p->state = UNUSED;
+> 
+>         if(status){
+>           *status = p -> status; // passing back the status
+>         }
+> 
+>         release(&ptable.lock);
+>         return pid;
+>       }
+>     }
+> 
+>     // No point waiting if we don't have any children.
+>     if(!havekids || curproc->killed){
+>       release(&ptable.lock);
+>       return -1;
+>     }
+> 
+>     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+>     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+>   }
+> }
+> 
+> // lab 2
+> // required to implement a blocking waitpid where kernel prevents current process from
+> // execution until a  process with the given pid terminates ????
+> int waitpid(int pid, int *status, int options){
+>   struct proc *p;
+>   int havekids;
+>   struct proc *curproc = myproc();
+>   
+>   acquire(&ptable.lock);
+>   for(;;){
+>     // Scan through table looking for exited children.
+>     havekids = 0;
+>     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+>       //if(p->parent != curproc) // this is for waiting for a child process
+>       //  continue;
+> 
+>       if(p -> pid != pid){ // if not the pid given by the user, keep going
+>         continue;
+>       }
+> 
+>       havekids = 1;
+>       if(p->state == ZOMBIE){
+>         // Found one.
+>         pid = p->pid;
+>         kfree(p->kstack);
+>         p->kstack = 0;
+>         freevm(p->pgdir);
+>         p->pid = 0;
+>         p->parent = 0;
+>         p->name[0] = 0;
+>         p->killed = 0;
+>         p->state = UNUSED;
+> 
+>         if(status){
+>           *status = p -> status; // passing back the status
+>         }
+> 
+>         release(&ptable.lock);
+>         return pid;
+>       }
+>     }
+> 
+>     // No point waiting if we don't have any children.
+>     if(!havekids || curproc->killed){
+>       release(&ptable.lock);
+>       return -1;
+>     }
+> 
+>     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+>     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+>   }
+> }
+> 
+> // lab 3 - set priority on a proc
+> void setprio(int priority){
+>   struct proc *p = myproc();
+>   // prio has range of 0 and 31
+>   if(priority >= 0 && priority <= 31){
+>     acquire(&ptable.lock);
+>     p -> prio = priority;
+>     p -> state = RUNNABLE;
+>     cprintf("PID: %d, Prio: %d\n", p -> pid, priority);
+>     sched();
+>     release(&ptable.lock);
+>   }
+> }
+> 
+332a512,565
+>     struct proc *ptorun = 0; // to store the process to run // highest prio and lowest run time to avoid starvation
+>     int highestprio = 32; // start off as 32 since highest is 31
+>     int lowestruns = 100000; // part of aging
+> 
+>     acquire(&ptable.lock);
+>     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+>       if(p -> state != RUNNABLE)
+>         continue;
+> 
+>       if(p -> prio < highestprio && p -> runs < lowestruns){
+>         highestprio = p -> prio; // keep track of highest prio
+>         lowestruns = p -> runs; // keep track of lowest runs
+>         ptorun = p; // store process to run later
+>       }
+>     }
+>     // now got the highest prio and lowest run, so know which process to run first
+>     // increase prio of other proc, and add a run to the proc that will run
+>     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+>       if(p -> state != RUNNABLE)
+>         continue;
+>       
+>       if(p != ptorun){ // other processes not the proccess that we will run
+>         if(p -> prio > 0){
+>           p -> prio --; // increase prio, but not go to negative
+>         }
+>       }
+>     }
+> 
+>     if(ptorun){
+>       // Switch to chosen process.  It is the process's job
+>       // to release ptable.lock and then reacquire it
+>       // before jumping back to us.
+>       p = ptorun; // run the proccess that we found to have highest prio and lowest run. 
+>       c->proc = p;
+>       switchuvm(p);
+>       p->state = RUNNING;
+>       p -> runs++; // add 1 to run lab 3
+>       if(p -> prio < 31){
+>         p -> prio++; // decrease the prio by adding 1, making sure not over 31
+>       }
+>       uint tmpstart = ticks; // time start
+> 
+>       swtch(&(c->scheduler), p->context);
+>       switchkvm();
+> 
+>       // Process is done running for now.
+>       // It should have changed its p->state before coming back.
+>       uint tmpend = ticks; // time end
+>       p -> burst = p -> burst + (tmpend - tmpstart); // calc burst time and increment each time
+>       c->proc = 0;
+>     }
+>     release(&ptable.lock);
+> 
+> /*
+354c587
+< 
+---
+> */
+Only in lab-3: proc.d
+diff -r xv6-original/proc.h lab-3/proc.h
+51a52,56
+>   int status;                   // so can save exit status - Lab 2
+>   int prio;                     // add priority value to a proc, [0, 31], lab 3
+>   int runs;                     // lab 3, aging? how man runs it has done. so when prio has ties, it goes by runs
+>   int timestart;               // lab 3, keep track of start time
+>   int burst;                  // lab 3 keep track of burst, time its runnning
+Only in lab-3: proc.o
+Only in lab-3: _rm
+Only in lab-3: rm.asm
+Only in lab-3: rm.d
+Only in lab-3: rm.o
+Only in lab-3: rm.sym
+Only in lab-3: _sh
+Only in lab-3: sh.asm
+Only in lab-3: sh.d
+Only in lab-3: sh.o
+Only in lab-3: sh.sym
+Only in lab-3: sleeplock.d
+Only in lab-3: sleeplock.o
+Only in lab-3: spinlock.d
+Only in lab-3: spinlock.o
+Only in lab-3: _stressfs
+Only in lab-3: stressfs.asm
+Only in lab-3: stressfs.d
+Only in lab-3: stressfs.o
+Only in lab-3: stressfs.sym
+Only in lab-3: string.d
+Only in lab-3: string.o
+Only in lab-3: swtch.o
+diff -r xv6-original/syscall.c lab-3/syscall.c
+106a107,114
+> // lab 2
+> extern int sys_exitStatus(void);
+> extern int sys_waitStatus(void);
+> extern int sys_waitpid(void);
+> 
+> // lab 3
+> extern int sys_setprio(void);
+> 
+128a137,144
+> 
+> // lab 2
+> [SYS_exitStatus]  sys_exitStatus,
+> [SYS_waitStatus]  sys_waitStatus,
+> [SYS_waitpid]     sys_waitpid,
+> 
+> // lab 3
+> [SYS_setprio]     sys_setprio,
+Only in lab-3: syscall.d
+diff -r xv6-original/syscall.h lab-3/syscall.h
+22a23,30
+> 
+> // lab 2
+> #define SYS_exitStatus 22
+> #define SYS_waitStatus 23
+> #define SYS_waitpid 24
+> 
+> // lab 3
+> #define SYS_setprio 25
+Only in lab-3: syscall.o
+Only in lab-3: sysfile.d
+Only in lab-3: sysfile.o
+diff -r xv6-original/sysproc.c lab-3/sysproc.c
+22a23,79
+> // lab 2
+> int sys_exitStatus(void)
+> {
+>   int status;
+> 
+>   if (argint(0, &status) < 0){ // pass in an integer, passing arguments into a kernel function - https://stackoverflow.com/questions/27068394/how-to-pass-a-value-into-a-system-call-function-in-xv6
+>     return -1;
+>   }
+> 
+>   exitStatus(status);
+> 
+>   return 0; // not reached
+> }
+> 
+> //sysfile.c has code that uses argptr
+> 
+> int sys_waitStatus(void){
+>   int *status;
+>   
+>   if (argptr(0, (void *) &status, sizeof(*status)) < 0){
+>     return -1;
+>   }
+> 
+>   return waitStatus(status);
+> }
+> 
+> int sys_waitpid(void){
+>   int pid;
+>   int options;
+>   int *status;
+> 
+>   // pid is 0, status 1, options 2. cuz waitpid(pid, status, options)
+>   if (argint(0, &pid) < 0){
+>     return -1;
+>   }
+>   if (argptr(1, (void *) &status, sizeof(*status)) < 0){
+>     return -1;
+>   }
+>   if (argint(2, &options) < 0){
+>     return -1;
+>   }
+> 
+>   return waitpid(pid, status, options);
+> }
+> 
+> // lab 3
+> int sys_setprio(void){
+>   int priority;
+>   if(argint(0, &priority) < 0){
+>     return -1;
+>   }
+> 
+>   setprio(priority);
+> 
+>   return 0;
+> }
+> 
+Only in lab-3: sysproc.d
+Only in lab-3: sysproc.o
+Only in lab-3: _test
+Only in lab-3: test.asm
+Only in lab-3: test.c
+Only in lab-3: test.d
+Only in lab-3: test.o
+Only in lab-3: test.sym
+Only in lab-3: trapasm.o
+Only in lab-3: trap.d
+Only in lab-3: trap.o
+Only in lab-3: uart.d
+Only in lab-3: uart.o
+Only in lab-3: ulib.d
+Only in lab-3: ulib.o
+Only in lab-3: umalloc.d
+Only in lab-3: umalloc.o
+diff -r xv6-original/user.h lab-3/user.h
+26a27,34
+> // lab 2
+> void exitStatus(int status);
+> int waitStatus(int *status);
+> int waitpid(int pid, int *status, int options);
+> 
+> // lab 3
+> void setprio(int);
+> 
+Only in lab-3: _usertests
+Only in lab-3: usertests.asm
+Only in lab-3: usertests.d
+Only in lab-3: usertests.o
+Only in lab-3: usertests.sym
+Only in lab-3: usys.o
+diff -r xv6-original/usys.S lab-3/usys.S
+31a32,35
+> SYSCALL(exitStatus)
+> SYSCALL(waitStatus)
+> SYSCALL(waitpid)
+> SYSCALL(setprio)
+\ No newline at end of file
+Only in lab-3: vectors.o
+Only in lab-3: vectors.S
+Only in lab-3: vm.d
+Only in lab-3: vm.o
+Only in lab-3: _wc
+Only in lab-3: wc.asm
+Only in lab-3: wc.d
+Only in lab-3: wc.o
+Only in lab-3: wc.sym
+Only in lab-3: xv6.img
+Only in lab-3: _zombie
+Only in lab-3: zombie.asm
+Only in lab-3: zombie.d
+Only in lab-3: zombie.o
+Only in lab-3: zombie.sym
