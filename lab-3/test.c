@@ -10,7 +10,8 @@
 
 int main(int argc, char *argv[]){
     if(argc >= 1){
-        setprio(1);
+        int prio = atoi(argv[1])
+        setprio(prio);
         int limit = 4300;
         int i, j;
         for(i = 0; i < limit; i++){
