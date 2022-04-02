@@ -88,6 +88,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p -> prio = 0; // lab 3
+  p -> runs = 0; // lab 3
 
   release(&ptable.lock);
 
@@ -199,6 +201,8 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+  np -> prio = curproc -> prio; // lab 3
+  np -> runs = 0; // lab 3
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -308,6 +312,19 @@ wait(void)
 
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
+}
+
+// lab 3 - set priority on a proc
+void setprio(int priority){
+  struct proc *p = myproc();
+  // prio has range of 0 and 31
+  if(priority >= 0 && priority <= 31){
+    acquire(&ptable.lock);
+    p -> prio = priority;
+    p -> state = RUNNABLE;
+    sched();
+    release(&ptable.lock);
   }
 }
 

@@ -49,6 +49,8 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+  int prio;                     // add priority value to a proc, [0, 31], lab 3
+  int runs;                     // lab 3, avoid starvation? how man runs it has done. so when prio has ties, it goes by runs
 };
 
 // Process memory is laid out contiguously, low addresses first:
