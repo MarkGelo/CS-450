@@ -255,9 +255,9 @@ exit(void)
   end_op();
   curproc->cwd = 0;
 
-  timeend = ticks;
-  turnaroundtime = timeend - curproc -> timestart;
-  waitingtime = turnaroundtime - curproc -> burst;
+  int timeend = ticks;
+  int turnaroundtime = timeend - curproc -> timestart;
+  int waitingtime = turnaroundtime - curproc -> burst;
   cprintf("\n Turnaround time: %d | Waiting time: %d\n, ", turnaroundtime, waitingtime);
 
   acquire(&ptable.lock);
