@@ -109,6 +109,9 @@ extern int sys_exitStatus(void);
 extern int sys_waitStatus(void);
 extern int sys_waitpid(void);
 
+// lab 3
+extern int sys_setprio(void);
+
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
@@ -136,6 +139,9 @@ static int (*syscalls[])(void) = {
 [SYS_exitStatus]  sys_exitStatus,
 [SYS_waitStatus]  sys_waitStatus,
 [SYS_waitpid]     sys_waitpid,
+
+// lab 3
+[SYS_setprio]     sys_setprio,
 };
 
 void

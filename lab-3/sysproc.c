@@ -65,6 +65,18 @@ int sys_waitpid(void){
   return waitpid(pid, status, options);
 }
 
+// lab 3
+int sys_setprio(void){
+  int priority;
+  if(argint(0, &priority) < 0){
+    return -1;
+  }
+
+  setprio(priority);
+
+  return 0;
+}
+
 int
 sys_wait(void)
 {

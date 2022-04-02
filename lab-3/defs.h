@@ -123,6 +123,7 @@ int             waitStatus(int*); // lab 2
 int             waitpid(int, int*, int); // lab 2
 void            wakeup(void*);
 void            yield(void);
+void            setprio(int); // lab 3
 
 // swtch.S
 void            swtch(struct context**, struct context*);

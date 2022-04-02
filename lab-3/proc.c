@@ -88,6 +88,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p -> prio = 0; // lab 3
+  p -> runs = 0; // lab 3
 
   release(&ptable.lock);
 
@@ -199,6 +201,8 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+  np -> prio = curproc -> prio; // lab 3
+  np -> runs = 0; // lab 3
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -463,6 +467,19 @@ int waitpid(int pid, int *status, int options){
   }
 }
 
+// lab 3 - set priority on a proc
+void setprio(int priority){
+  struct proc *p = myproc();
+  // prio has range of 0 and 31
+  if(priority >= 0 && priority <= 31){
+    acquire(&ptable.lock);
+    p -> prio = priority;
+    p -> state = RUNNABLE;
+    sched();
+    release(&ptable.lock);
+  }
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -482,6 +499,57 @@ scheduler(void)
     // Enable interrupts on this processor.
     sti();
 
+    struct proc *ptorun = 0; // to store the process to run // highest prio and lowest run time to avoid starvation
+    int highestprio = 32; // start off as 32 since highest is 31
+    int lowestruns = 100000; // part of aging
+
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p -> state != RUNNABLE)
+        continue;
+
+      if(p -> prio < highestprio && p -> runs < lowestruns){
+        highestprio = p -> prio; // keep track of highest prio
+        lowestruns = p -> runs; // keep track of lowest runs
+        ptorun = p; // store process to run later
+      }
+    }
+    // now got the highest prio and lowest run, so know which process to run first
+    // increase prio of other proc, and add a run to the proc that will run
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p -> state != RUNNABLE)
+        continue;
+      
+      if(p != ptorun){ // other processes not the proccess that we will run
+        if(p -> prio > 0){
+          p -> prio --; // increase prio, but not go to negative
+        }
+      }
+    }
+
+    if(ptorun){
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      p = ptorun; // run the proccess that we found to have highest prio and lowest run. 
+      c->proc = p;
+      switchuvm(p);
+      p->state = RUNNING;
+      p -> runs++; // add 1 to run lab 3
+      if(p -> prio < 31){
+        p -> prio++; // decrease the prio by adding 1, making sure not over 31
+      }
+
+      swtch(&(c->scheduler), p->context);
+      switchkvm();
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+    }
+    release(&ptable.lock);
+
+/*
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -503,7 +571,7 @@ scheduler(void)
       c->proc = 0;
     }
     release(&ptable.lock);
-
+*/
   }
 }
 

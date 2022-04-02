@@ -25,3 +25,6 @@
 #define SYS_exitStatus 22
 #define SYS_waitStatus 23
 #define SYS_waitpid 24
+
+// lab 3
+#define SYS_setprio 25

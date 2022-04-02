@@ -29,6 +29,9 @@ void exitStatus(int status);
 int waitStatus(int *status);
 int waitpid(int pid, int *status, int options);
 
+// lab 3
+void setprio(int);
+
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
