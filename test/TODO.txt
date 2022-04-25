@@ -1,0 +1,18 @@
+TODO 1: This is the part of the code that we need to change to move the stack. The current code calls allocuvm to create 
+  two pages, one for the stack and one as a guard page starting at VA sz which is right after the code and data. 
+  It then clears the page table entry for the guard page.
+  
+TODO 2: you will have to change this to the address of the top word in the stack page. 
+   Note that KERNBASE is the first word in the kernel address space, so this is the word right under that.
+
+TODO 3: All of the functions that are defined in syscall.c (and sysfile.c) for accessing the user stack have some checks 
+    to see if the addresses are indeed on the stack. These checks compare the address against sz since that was the top of 
+    the stack in the old implementation. You have to change those checks (or remove them if it is easier).
+    Check all the accessor functions such as argint, argstr, argptr, argfd, etc…
+
+TODO 4: copyuvm(). This function is used as part of fork() to create a copy of the address space of the parent
+    process calling fork to the child process. It is implemented in vm.c
+    
+TODO 5: Add a case for the page fault. When a page fault occurs, you can check the address that caused the page fault in a hardware
+    register called CR2. The CR register (standing for Control Register) keep track of important hardware state information. 
+    You can read the CR2 register using the function rcr2().
