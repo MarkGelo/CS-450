@@ -77,17 +77,19 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
-  case T_PGFLT:
+  // error - a label can only be a part of a statement and ...
+  case T_PGFLT: {
     // check what address caused it and allocate new page ONLY if bad address is from the page right below stack
     uint addr_ = rcr2();
     struct proc *curproc = myproc();
-    if(allocuvm(curproc -> pgdir, PGROUNDDOWN(addr_), addr_ + PGSIZE) == 0){
+    if(allocuvm(curproc -> pgdir, PGROUNDDOWN(addr_), PGROUNDDOWN(addr_) + PGSIZE) == 0){
       exit();
     }
+    clearpteu(curproc -> pgdir, (char*)((KERNBASE - curproc -> pages * PGSIZE) - PGSIZE));
     curproc -> pages = curproc -> pages + 1;
-    cprintf('increased stack size');
+    cprintf("increased stack size");
     
-    break;
+    break; } // need brackets - stackoverflow.com/questions/27006986/what-is-wrong-with-my-switch-statement
   //PAGEBREAK: 13
   default:
     if(myproc() == 0 || (tf->cs&3) == 0){
