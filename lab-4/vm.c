@@ -322,7 +322,10 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
-  for(i = 0; i < sz; i += PGSIZE){
+
+  struct proc *curproc = myproc();
+  for(i = KERNBASE; i > (KERNBASE - 1) - ((curproc->pages) * PGSIZE); i -= PGSIZE){ 
+  // instead of 0 to curproc -> sz, its kernbase to 0 followed by page guard
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))

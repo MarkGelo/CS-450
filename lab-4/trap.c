@@ -77,7 +77,17 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
-
+  case T_PGFLT:
+    // check what address caused it and allocate new page ONLY if bad address is from the page right below stack
+    uint addr_ = rcr2();
+    struct proc *curproc = myproc();
+    if(allocuvm(curproc -> pgdir, PGROUNDDOWN(addr_), addr_ + PGSIZE) == 0){
+      exit();
+    }
+    curproc -> pages = curproc -> pages + 1;
+    cprintf('increased stack size');
+    
+    break;
   //PAGEBREAK: 13
   default:
     if(myproc() == 0 || (tf->cs&3) == 0){
