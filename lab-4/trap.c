@@ -85,9 +85,9 @@ trap(struct trapframe *tf)
     if(allocuvm(curproc -> pgdir, PGROUNDDOWN(addr_), PGROUNDDOWN(addr_) + PGSIZE) == 0){
       exit();
     }
-    clearpteu(curproc -> pgdir, (char*)((KERNBASE - curproc -> pages * PGSIZE) - PGSIZE));
+    //clearpteu(curproc -> pgdir, (char*)((KERNBASE - 1 - curproc -> pages * PGSIZE) - PGSIZE));
     curproc -> pages = curproc -> pages + 1;
-    cprintf("increased stack size");
+    cprintf("increased stack size\n");
     
     break; } // need brackets - stackoverflow.com/questions/27006986/what-is-wrong-with-my-switch-statement
   //PAGEBREAK: 13
